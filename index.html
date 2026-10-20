@@ -17,13 +17,64 @@ body.rain .veil,body.overcast .veil{background:rgba(7,16,29,.34)!important}
 .metric-sub{font-size:11px;color:#c6d7e5}
 @media(max-width:900px){.metric{width:33.333%;margin-bottom:8px}}
 @media(max-width:600px){.metric{width:50%}}
-</style><style>/* Cinque previsioni sempre sulla stessa riga, anche su Safari iPad */.days{display:-webkit-flex;display:flex;flex-wrap:nowrap;-webkit-flex-wrap:nowrap;overflow:visible}.days .day{float:none;width:20%;-webkit-flex:1 1 0;flex:1 1 0;min-width:0;margin:0 3px;padding-left:2px;padding-right:2px}.days .day:last-child{margin:0 3px}@media(max-width:760px){.days .day .ico{font-size:28px}.days .day .high{font-size:20px}.days .day .low{font-size:17px}}</style></head><body class="cloudy"><div class="sky"></div><div class="mountains"></div><div class="clouds"></div><div class="weather-effect"></div><div class="veil"></div><div class="page"><div class="top"><div class="place"><h1>☀ Terlano</h1><small>Alto Adige · Stazione meteo</small></div><div class="time"><div id="date" class="date"></div><div id="clock" class="clock">--:--</div><div class="date" id="updated">In attesa dei dati</div></div></div><div class="gridtop"><div class="left"><div class="glass hero"><h2>Condizioni attuali</h2><div class="mainweather"><div class="weathericon" id="weathericon">⛅</div><div class="reading"><div class="temp" id="temp">--°</div><div class="condition" id="condition">Caricamento meteo...</div></div></div><div class="minirow"><div class="mini"><span>💧 Umidità</span><b id="humidity">--</b></div><div class="mini"><span>〰 Vento</span><b id="wind">--</b></div><div class="mini"><span>◴ Pressione</span><b id="pressure">--</b></div></div></div></div><div class="right"><div class="glass sun"><div class="sunpair"><span class="symbol">🌅</span>Alba<b id="sunrise">--:--</b></div><div class="sunpair"><span class="symbol">🌇</span>Tramonto<b id="sunset">--:--</b></div></div><div class="glass moon"><div class="moonicon" id="moonicon">🌙</div><div class="moondetails">Fase lunare<strong id="moon">--</strong><span id="fullmoon">Prossima luna piena: --</span></div></div></div></div><div class="glass forecast"><h2>Previsioni per i prossimi 5 giorni</h2><div class="days" id="days"></div></div><div class="metrics">
+</style><style>/* Cinque previsioni sempre sulla stessa riga, anche su Safari iPad */.days{display:-webkit-flex;display:flex;flex-wrap:nowrap;-webkit-flex-wrap:nowrap;overflow:visible}.days .day{float:none;width:20%;-webkit-flex:1 1 0;flex:1 1 0;min-width:0;margin:0 3px;padding-left:2px;padding-right:2px}.days .day:last-child{margin:0 3px}@media(max-width:760px){.days .day .ico{font-size:28px}.days .day .high{font-size:20px}.days .day .low{font-size:17px}}</style>
+<style>
+/* iPad landscape: innerHeight includes the space actually available below Safari's bars.
+   Flexbox (including WebKit prefixes) is supported by Safari iOS 10. */
+@media screen and (min-width:761px) and (orientation:landscape){
+ .page{height:100vh;padding:8px 18px;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column}
+ .top{-webkit-flex:0 0 auto;flex:0 0 auto;margin-bottom:8px;min-height:67px}
+ .place h1{font-size:38px;line-height:42px}.place small{font-size:15px}
+ .clock{font-size:40px;line-height:43px}.date{font-size:13px;line-height:16px}
+ .glass{padding:10px 14px;margin-bottom:8px;border-radius:14px}
+ .gridtop{display:-webkit-flex;display:flex;-webkit-flex:1 0 220px;flex:1 0 220px;overflow:visible;margin-bottom:8px}
+ .left,.right{float:none;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;min-width:0}
+ .hero{min-height:0;height:100%;margin-bottom:0}
+ .glass h2{font-size:17px;line-height:20px;margin-bottom:6px}
+ .mainweather{height:111px}.weathericon{font-size:76px;line-height:108px}
+ .temp{font-size:73px;line-height:80px}.condition{font-size:20px;line-height:25px}
+ .minirow{margin-top:8px;padding-top:8px}.mini span{font-size:14px;margin-bottom:4px}.mini b{font-size:21px}
+ .sun{-webkit-flex:0 0 82px;flex:0 0 82px;min-height:0}
+ .sunpair{font-size:15px}.sunpair b{font-size:27px;margin-top:4px}.sunpair .symbol{font-size:32px}
+ .moon{-webkit-flex:1 0 auto;flex:1 0 auto;min-height:0;margin-bottom:0;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center}
+ .moonicon,.moondetails{float:none}.moonicon{font-size:76px}.moondetails{font-size:15px}
+ .moondetails strong{font-size:21px;line-height:25px;margin:6px 0}#fullmoon{line-height:20px}
+ .forecast{-webkit-flex:0 0 auto;flex:0 0 auto}
+ .days .day{min-height:112px;padding-top:6px;padding-bottom:6px}
+ .day .ico{font-size:31px;line-height:35px;margin:2px 0}.high{font-size:24px}.low{font-size:20px}
+ .metrics{-webkit-flex:0 0 auto;flex:0 0 auto;margin-bottom:0}
+ .metric{width:20%;margin-bottom:0}.metricbox{min-height:0;height:124px;padding:9px}
+ .metric-title{font-size:13px}.metric-value{font-size:21px;line-height:24px;margin:5px 0 3px}
+ .spark{height:39px}.metric-sub{font-size:10px;line-height:14px}
+ .footer{-webkit-flex:0 0 auto;flex:0 0 auto;font-size:11px;line-height:15px;margin-top:5px}
+}
+@media screen and (min-width:761px) and (orientation:landscape) and (max-height:650px){
+ .top{min-height:59px;margin-bottom:6px}.place h1{font-size:34px;line-height:36px}.clock{font-size:34px;line-height:35px}
+ .gridtop{-webkit-flex-basis:210px;flex-basis:210px;margin-bottom:6px}
+ .glass{padding-top:8px;padding-bottom:8px}.sun{-webkit-flex-basis:74px;flex-basis:74px}
+ .mainweather{height:105px}.weathericon{line-height:102px}.temp{font-size:68px;line-height:75px}
+ .days .day{min-height:102px;padding-top:4px;padding-bottom:4px}.day .ico{font-size:29px;line-height:31px}
+ .metricbox{height:112px;padding:7px 9px}.spark{height:33px}.metric-value{margin-top:3px;margin-bottom:2px}
+}
+</style></head><body class="cloudy"><div class="sky"></div><div class="mountains"></div><div class="clouds"></div><div class="weather-effect"></div><div class="veil"></div><div class="page"><div class="top"><div class="place"><h1>☀ Terlano</h1><small>Alto Adige · Stazione meteo</small></div><div class="time"><div id="date" class="date"></div><div id="clock" class="clock">--:--</div><div class="date" id="updated">In attesa dei dati</div></div></div><div class="gridtop"><div class="left"><div class="glass hero"><h2>Condizioni attuali</h2><div class="mainweather"><div class="weathericon" id="weathericon">⛅</div><div class="reading"><div class="temp" id="temp">--°</div><div class="condition" id="condition">Caricamento meteo...</div></div></div><div class="minirow"><div class="mini"><span>💧 Umidità</span><b id="humidity">--</b></div><div class="mini"><span>〰 Vento</span><b id="wind">--</b></div><div class="mini"><span>◴ Pressione</span><b id="pressure">--</b></div></div></div></div><div class="right"><div class="glass sun"><div class="sunpair"><span class="symbol">🌅</span>Alba<b id="sunrise">--:--</b></div><div class="sunpair"><span class="symbol">🌇</span>Tramonto<b id="sunset">--:--</b></div></div><div class="glass moon"><div class="moonicon" id="moonicon">🌙</div><div class="moondetails">Fase lunare<strong id="moon">--</strong><span id="fullmoon">Prossima luna piena: --</span></div></div></div></div><div class="glass forecast"><h2>Previsioni per i prossimi 5 giorni</h2><div class="days" id="days"></div></div><div class="metrics">
 <div class="metric"><div class="metricbox"><div class="metric-title">🌡️ Temperatura</div><div class="metric-value" id="mt">--</div><svg class="spark" id="chart-temp" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">💧 Umidità</div><div class="metric-value" id="mh">--</div><svg class="spark" id="chart-humidity" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">💨 Vento</div><div class="metric-value" id="mw">--</div><svg class="spark" id="chart-wind" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">◴ Pressione</div><div class="metric-value" id="mp">--</div><svg class="spark" id="chart-pressure" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">☔ Pioggia</div><div class="metric-value" id="mr">--</div><svg class="spark" id="chart-rain" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
 </div><div class="footer" id="status">Dati meteo: Open-Meteo · Aggiornamento ogni 10 minuti</div></div><script>
+
+// Safari iOS 10 reports 100vh using the larger layout viewport.
+// Use innerHeight so browser bars and orientation changes are accounted for.
+function fitLandscape(){
+ var page=document.querySelector('.page');
+ page.style.height=window.innerWidth>760&&window.innerWidth>window.innerHeight?window.innerHeight+'px':'';
+}
+fitLandscape();
+window.addEventListener('resize',fitLandscape,false);
+window.addEventListener('orientationchange',function(){fitLandscape();setTimeout(fitLandscape,300);},false);
+window.addEventListener('pageshow',fitLandscape,false);
+
 var $=function(s){return document.getElementById(s)};function pad(n){return(n<10?'0':'')+n}function clock(){var d=new Date();$('clock').innerHTML=pad(d.getHours())+':'+pad(d.getMinutes());$('date').innerHTML=d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}clock();setInterval(clock,15000);
 // Fasi astronomiche: algoritmo di Jean Meeus, Astronomical Algorithms, cap. 49.
 // JDE corretto con una stima Delta T per gli anni attuali; orari locali del dispositivo.
