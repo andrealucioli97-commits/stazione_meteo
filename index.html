@@ -104,7 +104,17 @@ body.rain .veil,body.overcast .veil{background:rgba(7,16,29,.34)!important}
  .hero .sensor-box{padding:8px}
  .hero .sensor-state{font-size:10px;line-height:14px}
 }
-</style></head><body class="cloudy"><div class="sky"></div><div class="mountains"></div><div class="clouds"></div><div class="weather-effect"></div><div class="veil"></div><div class="page"><div class="top"><div class="place"><h1>🏠 Terlano</h1><small>Alto Adige · Stazione meteo</small></div><div class="time"><div id="date" class="date"></div><div id="clock" class="clock">--:--</div><div class="date" id="updated">In attesa dei dati</div></div></div><div class="gridtop"><div class="left"><div class="glass hero"><h2>Condizioni attuali <span class="weather-source">· Open-Meteo</span></h2><div class="mainweather"><div class="weathericon" id="weathericon">⛅</div><div class="reading"><div class="condition" id="condition">Caricamento meteo...</div></div></div><div class="sensor-pair" aria-label="Misure dei sensori Ecowitt"><div class="sensor-card"><div class="sensor-box"><h3>Interno</h3><div class="sensor-values"><span id="indoor-temp">-- °C</span><span class="sensor-humidity" id="indoor-humidity">-- %</span></div><div class="sensor-state" id="indoor-state" role="status">Sensore non collegato</div></div></div><div class="sensor-card"><div class="sensor-box"><h3>Esterno</h3><div class="sensor-values"><span id="outdoor-temp">-- °C</span><span class="sensor-humidity" id="outdoor-humidity">-- %</span></div><div class="sensor-state" id="outdoor-state" role="status">Sensore non collegato</div></div></div></div></div></div><div class="right"><div class="glass sun"><div class="sunpair"><span class="symbol">🌅</span>Alba<b id="sunrise">--:--</b></div><div class="sunpair"><span class="symbol">🌇</span>Tramonto<b id="sunset">--:--</b></div></div><div class="glass moon"><div class="moonicon" id="moonicon">🌙</div><div class="moondetails">Fase lunare<strong id="moon">--</strong><span id="fullmoon">Prossima luna piena: --</span></div></div></div></div><div class="glass forecast"><h2>Previsioni · oggi e prossimi 4 giorni</h2><div class="days" id="days"></div></div><div class="metrics">
+</style><style>
+.sensor-extremes{font-size:12px;line-height:16px;margin-top:3px;color:#dce9f3;white-space:nowrap}
+@media screen and (min-width:761px) and (orientation:landscape) and (max-height:650px){
+ .hero .sensor-box{padding:5px 10px}
+ .hero .sensor-box h3{font-size:16px;line-height:18px;margin-bottom:3px}
+ .hero .sensor-values{font-size:30px;line-height:34px}
+ .hero .sensor-state{font-size:11px;line-height:14px;margin-top:2px}
+ .sensor-extremes{font-size:11px;line-height:14px;margin-top:2px}
+}
+@media(max-width:760px){.sensor-extremes{font-size:10px}}
+</style></head><body class="cloudy"><div class="sky"></div><div class="mountains"></div><div class="clouds"></div><div class="weather-effect"></div><div class="veil"></div><div class="page"><div class="top"><div class="place"><h1>🏠 Terlano</h1><small>Alto Adige · Stazione meteo</small></div><div class="time"><div id="date" class="date"></div><div id="clock" class="clock">--:--</div><div class="date" id="updated">In attesa dei dati</div></div></div><div class="gridtop"><div class="left"><div class="glass hero"><h2>Condizioni attuali <span class="weather-source">· Open-Meteo</span></h2><div class="mainweather"><div class="weathericon" id="weathericon">⛅</div><div class="reading"><div class="condition" id="condition">Caricamento meteo...</div></div></div><div class="sensor-pair" aria-label="Misure dei sensori Ecowitt"><div class="sensor-card"><div class="sensor-box"><h3>Interno</h3><div class="sensor-values"><span id="indoor-temp">-- °C</span><span class="sensor-humidity" id="indoor-humidity">-- %</span></div><div class="sensor-extremes" id="indoor-extremes">Oggi · Min --° · Max --°</div><div class="sensor-state" id="indoor-state" role="status">Sensore non collegato</div></div></div><div class="sensor-card"><div class="sensor-box"><h3>Esterno</h3><div class="sensor-values"><span id="outdoor-temp">-- °C</span><span class="sensor-humidity" id="outdoor-humidity">-- %</span></div><div class="sensor-extremes" id="outdoor-extremes">Oggi · Min --° · Max --°</div><div class="sensor-state" id="outdoor-state" role="status">Sensore non collegato</div></div></div></div></div></div><div class="right"><div class="glass sun"><div class="sunpair"><span class="symbol">🌅</span>Alba<b id="sunrise">--:--</b></div><div class="sunpair"><span class="symbol">🌇</span>Tramonto<b id="sunset">--:--</b></div></div><div class="glass moon"><div class="moonicon" id="moonicon">🌙</div><div class="moondetails">Fase lunare<strong id="moon">--</strong><span id="fullmoon">Prossima luna piena: --</span></div></div></div></div><div class="glass forecast"><h2>Previsioni · oggi e prossimi 4 giorni</h2><div class="days" id="days"></div></div><div class="metrics">
 <div class="metric"><div class="metricbox"><div class="metric-title">🌡️ Temperatura esterna</div><div class="metric-value" id="mt">--</div><svg class="spark" id="chart-temp" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub" id="sensor-temp-sub">In attesa di misure Ecowitt</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">💧 Umidità esterna</div><div class="metric-value" id="mh">--</div><svg class="spark" id="chart-humidity" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub" id="sensor-humidity-sub">In attesa di misure Ecowitt</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">💨 Vento</div><div class="metric-value" id="mw">--</div><svg class="spark" id="chart-wind" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
@@ -260,4 +270,23 @@ function loadSensors(){
  x.onerror=unavailable;x.ontimeout=unavailable;x.send();
 }
 renderSensors(null);loadSensors();setInterval(loadSensors,120000);
+
+function renderDailySensors(data){
+ var today=romeToday(),zones=['indoor','outdoor'];
+ for(var i=0;i<zones.length;i++){
+  var zone=zones[i],d=data&&data.date===today&&data[zone];
+  var low=d&&sensorNumber(d.min,-60,80)?d.min.toFixed(1).replace('.',',')+'°':'--°';
+  var high=d&&sensorNumber(d.max,-60,80)?d.max.toFixed(1).replace('.',',')+'°':'--°';
+  $(zone+'-extremes').textContent='Oggi · Min '+low+' · Max '+high;
+ }
+}
+function loadDailySensors(){
+ renderDailySensors(dailySensorValues);
+ var x=new XMLHttpRequest();x.open('GET',sensorEndpoint.replace(/\\/current$/,'/daily'),true);x.timeout=12000;
+ function unavailable(){dailySensorValues=null;renderDailySensors(null);}
+ x.onload=function(){if(x.status!==200){unavailable();return;}try{dailySensorValues=JSON.parse(x.responseText);renderDailySensors(dailySensorValues);}catch(e){unavailable();}};
+ x.onerror=unavailable;x.ontimeout=unavailable;x.send();
+}
+var dailySensorValues=null;
+setTimeout(loadDailySensors,1500);setInterval(loadDailySensors,120000);
 </script></body></html>
