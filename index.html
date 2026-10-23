@@ -250,6 +250,8 @@ function sensorGraphs(data){
 }
 
 function renderSensors(data){
+ currentSensorValues=data;
+ renderDailySensors(dailySensorValues);
  sensorGraphs(data);
  var zones=['indoor','outdoor'],now=new Date().getTime();
  for(var i=0;i<zones.length;i++){
@@ -275,8 +277,17 @@ function renderDailySensors(data){
  var today=romeToday(),zones=['indoor','outdoor'];
  for(var i=0;i<zones.length;i++){
   var zone=zones[i],d=data&&data.date===today&&data[zone];
-  var low=d&&sensorNumber(d.min,-60,80)?d.min.toFixed(1).replace('.',',')+'°':'--°';
-  var high=d&&sensorNumber(d.max,-60,80)?d.max.toFixed(1).replace('.',',')+'°':'--°';
+  var minValue=d&&sensorNumber(d.min,-60,80)?d.min:null,maxValue=d&&sensorNumber(d.max,-60,80)?d.max:null;
+  var live=currentSensorValues&&currentSensorValues[zone],stamp=live&&typeof live.updated_at==='string'?Date.parse(live.updated_at):NaN,now=new Date().getTime();
+  if(d&&live&&sensorNumber(live.temperature,-60,80)&&isFinite(stamp)&&now-stamp<=900000&&stamp<=now+60000){
+   var parts=new Date(stamp).toLocaleDateString('en-GB',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).split('/');
+   if(parts[2]+'-'+parts[1]+'-'+parts[0]===today){
+    if(minValue!==null)minValue=Math.min(minValue,live.temperature);
+    if(maxValue!==null)maxValue=Math.max(maxValue,live.temperature);
+   }
+  }
+  var low=minValue===null?'--°':minValue.toFixed(1).replace('.',',')+'°';
+  var high=maxValue===null?'--°':maxValue.toFixed(1).replace('.',',')+'°';
   $(zone+'-extremes').textContent='Oggi · Min '+low+' · Max '+high;
  }
 }
@@ -287,6 +298,6 @@ function loadDailySensors(){
  x.onload=function(){if(x.status!==200){unavailable();return;}try{dailySensorValues=JSON.parse(x.responseText);renderDailySensors(dailySensorValues);}catch(e){unavailable();}};
  x.onerror=unavailable;x.ontimeout=unavailable;x.send();
 }
-var dailySensorValues=null;
+var currentSensorValues=null,dailySensorValues=null;
 setTimeout(loadDailySensors,1500);setInterval(loadDailySensors,120000);
 </script></body></html>
