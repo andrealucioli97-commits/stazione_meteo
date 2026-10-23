@@ -282,7 +282,7 @@ function renderDailySensors(data){
 }
 function loadDailySensors(){
  renderDailySensors(dailySensorValues);
- var x=new XMLHttpRequest();x.open('GET',sensorEndpoint.replace(/\\/current$/,'/daily'),true);x.timeout=12000;
+ var x=new XMLHttpRequest();x.open('GET',sensorEndpoint.slice(0,-8)+'/daily',true);x.timeout=12000;
  function unavailable(){dailySensorValues=null;renderDailySensors(null);}
  x.onload=function(){if(x.status!==200){unavailable();return;}try{dailySensorValues=JSON.parse(x.responseText);renderDailySensors(dailySensorValues);}catch(e){unavailable();}};
  x.onerror=unavailable;x.ontimeout=unavailable;x.send();
