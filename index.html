@@ -118,7 +118,7 @@ body.rain .veil,body.overcast .veil{background:rgba(7,16,29,.34)!important}
 <div class="metric"><div class="metricbox"><div class="metric-title">🌡️ Temperatura esterna</div><div class="metric-value" id="mt">--</div><svg class="spark" id="chart-temp" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub" id="sensor-temp-sub">In attesa di misure Ecowitt</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">💧 Umidità esterna</div><div class="metric-value" id="mh">--</div><svg class="spark" id="chart-humidity" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub" id="sensor-humidity-sub">In attesa di misure Ecowitt</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">💨 Vento</div><div class="metric-value" id="mw">--</div><svg class="spark" id="chart-wind" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
-<div class="metric"><div class="metricbox"><div class="metric-title">◴ Pressione</div><div class="metric-value" id="mp">--</div><svg class="spark" id="chart-pressure" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
+<div class="metric"><div class="metricbox"><div class="metric-title">◴ Pressione locale</div><div class="metric-value" id="mp">--</div><svg class="spark" id="chart-pressure" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub" id="sensor-pressure-sub">Ecowitt · ultime 24 ore</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">☔ Pioggia</div><div class="metric-value" id="mr">--</div><svg class="spark" id="chart-rain" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub">Ultime 24 ore</div></div></div>
 </div><div class="footer" id="status">Dati meteo: Open-Meteo · Aggiornamento ogni 2 minuti</div></div><script>
 
@@ -182,7 +182,7 @@ var photos={
 };
 function setPhoto(weather,night){var key=night?'night':weather;var url=photos[key]||photos.cloudy;document.body.style.backgroundImage='url("'+url+'")';}
 function spark(id,vals,color){var a=[],i,n,min=1e30,max=-1e30;for(i=0;i<vals.length;i++){n=Number(vals[i]);if(isFinite(n)){a.push(n);if(n<min)min=n;if(n>max)max=n}}if(a.length<2)return;var pts=[];for(i=0;i<a.length;i++){var y=49-(a[i]-min)/(max-min||1)*40;pts.push((i*200/(a.length-1)).toFixed(1)+','+y.toFixed(1))}var svg=$(id);while(svg.firstChild)svg.removeChild(svg.firstChild);var ns='http://www.w3.org/2000/svg',line=document.createElementNS(ns,'polyline');line.setAttribute('points',pts.join(' '));line.setAttribute('fill','none');line.setAttribute('stroke',color);line.setAttribute('stroke-width','2.5');line.setAttribute('stroke-linecap','round');line.setAttribute('stroke-linejoin','round');svg.appendChild(line)}
-function metrics(d){var h=d.hourly||{},t=h.time||[];if(!t.length)return;var now=d.current&&d.current.time?d.current.time.slice(0,13):'';var last=-1;for(var i=0;i<t.length;i++)if(t[i].slice(0,13)<=now)last=i;if(last<0)last=t.length-1;var first=Math.max(0,last-23);function part(k){return(h[k]||[]).slice(first,last+1)}var temp=part('temperature_2m'),hum=part('relative_humidity_2m'),wind=part('wind_speed_10m'),press=part('surface_pressure'),rain=part('precipitation');if(!sensorEndpoint){spark('chart-temp',temp,'#ff9474');spark('chart-humidity',hum,'#68d5ff');}spark('chart-wind',wind,'#64e4cf');spark('chart-pressure',press,'#d7e8ff');spark('chart-rain',rain,'#77d5ff');var c=d.current||{}; if(!sensorEndpoint){$('mt').innerHTML=c.temperature_2m==null?'--':c.temperature_2m+' °C';$('mh').innerHTML=c.relative_humidity_2m==null?'--':c.relative_humidity_2m+' %';}$('mw').innerHTML=c.wind_speed_10m==null?'--':Math.round(c.wind_speed_10m)+' km/h';$('mp').innerHTML=c.surface_pressure==null?'--':Math.round(c.surface_pressure)+' hPa';var sum=0;for(var j=0;j<rain.length;j++)sum+=Number(rain[j])||0;$('mr').innerHTML=(Math.round(sum*10)/10).toFixed(1).replace('.',',')+' mm';}
+function metrics(d){var h=d.hourly||{},t=h.time||[];if(!t.length)return;var now=d.current&&d.current.time?d.current.time.slice(0,13):'';var last=-1;for(var i=0;i<t.length;i++)if(t[i].slice(0,13)<=now)last=i;if(last<0)last=t.length-1;var first=Math.max(0,last-23);function part(k){return(h[k]||[]).slice(first,last+1)}var temp=part('temperature_2m'),hum=part('relative_humidity_2m'),wind=part('wind_speed_10m'),press=part('surface_pressure'),rain=part('precipitation');if(!sensorEndpoint){spark('chart-temp',temp,'#ff9474');spark('chart-humidity',hum,'#68d5ff');}spark('chart-wind',wind,'#64e4cf');if(!sensorEndpoint)spark('chart-pressure',press,'#d7e8ff');spark('chart-rain',rain,'#77d5ff');var c=d.current||{}; if(!sensorEndpoint){$('mt').innerHTML=c.temperature_2m==null?'--':c.temperature_2m+' °C';$('mh').innerHTML=c.relative_humidity_2m==null?'--':c.relative_humidity_2m+' %';}$('mw').innerHTML=c.wind_speed_10m==null?'--':Math.round(c.wind_speed_10m)+' km/h';if(!sensorEndpoint)$('mp').innerHTML=c.surface_pressure==null?'--':Math.round(c.surface_pressure)+' hPa';var sum=0;for(var j=0;j<rain.length;j++)sum+=Number(rain[j])||0;$('mr').innerHTML=(Math.round(sum*10)/10).toFixed(1).replace('.',',')+' mm';}
 
 function renderDaily(a,today){
  var dates=a.time||[],todayIndex=-1,h='',shown=0;
@@ -220,12 +220,12 @@ try{var saved=JSON.parse(localStorage.getItem('terlano-ecowitt-ch1-v1')||'[]');i
 function sensorPlot(id,key,color){
  var svg=$(id);while(svg.firstChild)svg.removeChild(svg.firstChild);
  var now=new Date().getTime(),start=now-86400000,min=Infinity,max=-Infinity,rows=[],i;
- for(i=0;i<sensorHistory.length;i++){var p=sensorHistory[i];if(sensorNumber(p[key],key==='t'?-60:0,key==='t'?80:100)){rows.push(p);min=Math.min(min,p[key]);max=Math.max(max,p[key]);}}
+ for(i=0;i<sensorHistory.length;i++){var p=sensorHistory[i];if(p.at>=start&&p.at<=now&&sensorNumber(p[key],key==='t'?-60:key==='p'?300:0,key==='t'?80:key==='p'?1200:100)){rows.push(p);min=Math.min(min,p[key]);max=Math.max(max,p[key]);}}
  if(rows.length<2)return;
  var segments=[],pts=[],previous=null;
  for(i=0;i<rows.length;i++){
   var row=rows[i];
-  if(previous!==null&&row.at-previous>900000){if(pts.length>1)segments.push(pts);pts=[];}
+  if(previous!==null&&row.at-previous>2700000){if(pts.length>1)segments.push(pts);pts=[];}
   pts.push(((row.at-start)/86400000*200).toFixed(2)+','+(max===min?27:49-(row[key]-min)/(max-min)*40).toFixed(2));previous=row.at;
  }
  if(pts.length>1)segments.push(pts);
@@ -238,16 +238,41 @@ function sensorGraphs(data){
  sensorHistory=sensorHistory.filter(function(p){return p&&typeof p.at==='number'&&isFinite(p.at)&&p.at>=now-86400000&&p.at<=now+60000;});
  if(t!==null||h!==null){
   var point={at:stamp,t:t,h:h},found=false;
-  for(var i=0;i<sensorHistory.length;i++)if(sensorHistory[i].at===stamp){sensorHistory[i]=point;found=true;break;}
+  for(var i=0;i<sensorHistory.length;i++)if(sensorHistory[i].at===stamp){sensorHistory[i].t=t;sensorHistory[i].h=h;found=true;break;}
   if(!found)sensorHistory.push(point);
  }
  sensorHistory.sort(function(a,b){return a.at-b.at;});sensorHistory=sensorHistory.slice(-1500);
  try{localStorage.setItem('terlano-ecowitt-ch1-v1',JSON.stringify(sensorHistory));}catch(e){}
  $('mt').textContent=t===null?'--':t.toFixed(1).replace('.',',')+' °C';$('mh').textContent=h===null?'--':Math.round(h)+' %';
+ var pressure=data&&data.pressure,ps=pressure&&Date.parse(pressure.updated_at),pv=pressure&&sensorNumber(pressure.value,300,1200)&&isFinite(ps)&&now-ps<=900000&&ps<=now+60000?pressure.value:null;
+ if(pv!==null)mergeSensorHistory([{at:ps,p:pv}]);
+ $('mp').textContent=pv===null?'--':pv.toFixed(1).replace('.',',')+' hPa';
+ $('sensor-pressure-sub').textContent=pv===null?'Ecowitt · dati non disponibili':'Ecowitt · ultime 24 ore';
+ sensorPlot('chart-pressure','p','#d7e8ff');
  sensorPlot('chart-temp','t','#ff9474');sensorPlot('chart-humidity','h','#68d5ff');
  $('sensor-temp-sub').textContent=t===null?'Ecowitt · dati non disponibili':sensorHistory.length<2?'Ecowitt · raccolta in corso':'Ecowitt · ultime 24 ore';
  $('sensor-humidity-sub').textContent=h===null?'Ecowitt · dati non disponibili':sensorHistory.length<2?'Ecowitt · raccolta in corso':'Ecowitt · ultime 24 ore';
 }
+
+function mergeSensorHistory(points){
+ var now=new Date().getTime(),byTime={},i,key;
+ for(i=0;i<sensorHistory.length;i++){var old=sensorHistory[i];if(old&&sensorNumber(old.at,now-86400000,now+60000))byTime[old.at]=old;}
+ for(i=0;i<points.length;i++){
+  var point=points[i];if(!point||!sensorNumber(point.at,now-86400000,now+60000))continue;
+  var row=byTime[point.at]||{at:point.at,t:null,h:null,p:null};
+  for(var j=0;j<3;j++){key=['t','h','p'][j];if(sensorNumber(point[key],key==='t'?-60:key==='p'?300:0,key==='t'?80:key==='p'?1200:100))row[key]=point[key];}
+  byTime[point.at]=row;
+ }
+ sensorHistory=[];for(key in byTime)if(Object.prototype.hasOwnProperty.call(byTime,key))sensorHistory.push(byTime[key]);
+ sensorHistory.sort(function(a,b){return a.at-b.at;});sensorHistory=sensorHistory.slice(-1500);
+ try{localStorage.setItem('terlano-ecowitt-ch1-v1',JSON.stringify(sensorHistory));}catch(e){}
+}
+function loadSensorHistory(){
+ var x=new XMLHttpRequest();x.open('GET',sensorEndpoint.slice(0,-8)+'/history',true);x.timeout=12000;
+ x.onload=function(){if(x.status!==200)return;try{var data=JSON.parse(x.responseText);if(Object.prototype.toString.call(data.points)!=='[object Array]')return;mergeSensorHistory(data.points);sensorGraphs(currentSensorValues);}catch(e){}};
+ x.send();
+}
+setTimeout(loadSensorHistory,3500);setInterval(function(){setTimeout(loadSensorHistory,3500);},120000);
 
 function renderSensors(data){
  currentSensorValues=data;
@@ -299,5 +324,5 @@ function loadDailySensors(){
  x.onerror=unavailable;x.ontimeout=unavailable;x.send();
 }
 var currentSensorValues=null,dailySensorValues=null;
-setTimeout(loadDailySensors,1500);setInterval(loadDailySensors,120000);
+setTimeout(loadDailySensors,1500);setInterval(function(){setTimeout(loadDailySensors,1500);},120000);
 </script></body></html>
