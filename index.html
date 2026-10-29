@@ -114,6 +114,24 @@ body.rain .veil,body.overcast .veil{background:rgba(7,16,29,.34)!important}
  .sensor-extremes{font-size:11px;line-height:14px;margin-top:2px}
 }
 @media(max-width:760px){.sensor-extremes{font-size:10px}}
+</style><style>
+.hero .sensor-box h3{font-size:22px;line-height:27px;margin-bottom:8px}
+.hero .sensor-values{font-size:48px;line-height:55px;letter-spacing:-1px}
+.hero .sensor-humidity{font-size:29px;letter-spacing:0;margin-left:10px}
+.hero .sensor-extremes{font-size:15px;line-height:20px;margin-top:6px}
+.hero .sensor-state:empty{display:none}
+@media(min-width:761px) and (max-height:720px){
+.hero .mainweather{min-height:32px}.hero .weathericon{font-size:30px;line-height:32px}
+.hero .sensor-pair{min-height:0;margin-top:6px}
+.hero .sensor-box{padding:6px 8px}
+.hero .sensor-state{font-size:10px;line-height:12px;margin-top:2px}
+
+.hero .sensor-box h3{font-size:20px;line-height:24px;margin-bottom:4px}
+.hero .sensor-values{font-size:42px;line-height:48px}
+.hero .sensor-humidity{font-size:26px}
+.hero .sensor-extremes{font-size:14px;line-height:18px;margin-top:4px}
+}
+@media(max-width:760px){.hero .sensor-values{font-size:33px;line-height:40px}.hero .sensor-humidity{font-size:22px}.hero .sensor-extremes{font-size:12px}}
 </style></head><body class="cloudy"><div class="sky"></div><div class="mountains"></div><div class="clouds"></div><div class="weather-effect"></div><div class="veil"></div><div class="page"><div class="top"><div class="place"><h1>🏠 Terlano</h1><small>Alto Adige · Stazione meteo</small></div><div class="time"><div id="date" class="date"></div><div id="clock" class="clock">--:--</div><div class="date" id="updated">In attesa dei dati</div></div></div><div class="gridtop"><div class="left"><div class="glass hero"><h2>Condizioni attuali <span class="weather-source">· Open-Meteo</span></h2><div class="mainweather"><div class="weathericon" id="weathericon">⛅</div><div class="reading"><div class="condition" id="condition">Caricamento meteo...</div></div></div><div class="sensor-pair" aria-label="Misure dei sensori Ecowitt"><div class="sensor-card"><div class="sensor-box"><h3>Interno</h3><div class="sensor-values"><span id="indoor-temp">-- °C</span><span class="sensor-humidity" id="indoor-humidity">-- %</span></div><div class="sensor-extremes" id="indoor-extremes">Oggi · Min --° · Max --°</div><div class="sensor-state" id="indoor-state" role="status">Sensore non collegato</div></div></div><div class="sensor-card"><div class="sensor-box"><h3>Esterno</h3><div class="sensor-values"><span id="outdoor-temp">-- °C</span><span class="sensor-humidity" id="outdoor-humidity">-- %</span></div><div class="sensor-extremes" id="outdoor-extremes">Oggi · Min --° · Max --°</div><div class="sensor-state" id="outdoor-state" role="status">Sensore non collegato</div></div></div></div></div></div><div class="right"><div class="glass sun"><div class="sunpair"><span class="symbol">🌅</span>Alba<b id="sunrise">--:--</b></div><div class="sunpair"><span class="symbol">🌇</span>Tramonto<b id="sunset">--:--</b></div></div><div class="glass moon"><div class="moonicon" id="moonicon">🌙</div><div class="moondetails">Fase lunare<strong id="moon">--</strong><span id="fullmoon">Prossima luna piena: --</span></div></div></div></div><div class="glass forecast"><h2>Previsioni · oggi e prossimi 4 giorni</h2><div class="days" id="days"></div></div><div class="metrics">
 <div class="metric"><div class="metricbox"><div class="metric-title">🌡️ Temperatura esterna</div><div class="metric-value" id="mt">--</div><svg class="spark" id="chart-temp" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub" id="sensor-temp-sub">In attesa di misure Ecowitt</div></div></div>
 <div class="metric"><div class="metricbox"><div class="metric-title">💧 Umidità esterna</div><div class="metric-value" id="mh">--</div><svg class="spark" id="chart-humidity" viewBox="0 0 200 55" preserveAspectRatio="none"></svg><div class="metric-sub" id="sensor-humidity-sub">In attesa di misure Ecowitt</div></div></div>
@@ -209,6 +227,14 @@ function load(){var url='https://api.open-meteo.com/v1/forecast?latitude=46.5290
 //                 outdoor:{temperature:12.8,humidity:70,updated_at:"ISO-8601"}}
 // Each zone has its own measurement timestamp. Empty URL disables requests.
 var sensorEndpoint='https://meteo-terlano-ecowitt.andrea-lucioli97.workers.dev/current';
+function sensorURL(path){return sensorEndpoint.slice(0,-8)+path+'?refresh='+new Date().getTime();}
+function graphCaption(key){
+ var latest=0,count=0,now=new Date().getTime();
+ for(var i=0;i<sensorHistory.length;i++){var row=sensorHistory[i];if(row.at>=now-86400000&&row.at<=now&&sensorNumber(row[key],key==='t'?-60:key==='p'?300:0,key==='t'?80:key==='p'?1200:100)){latest=Math.max(latest,row.at);count++;}}
+ if(!count)return 'Storico non disponibile';
+ var clock=pad(new Date(latest).getHours())+':'+pad(new Date(latest).getMinutes());
+ return (now-latest>3600000?'Dati fermi alle ':count<2?'Prima misura · ':'24 ore · fino alle ')+clock;
+}
 function sensorNumber(value,min,max){
  return typeof value==='number'&&isFinite(value)&&value>=min&&value<=max;
 }
@@ -247,11 +273,11 @@ function sensorGraphs(data){
  var pressure=data&&data.pressure,ps=pressure&&Date.parse(pressure.updated_at),pv=pressure&&sensorNumber(pressure.value,300,1200)&&isFinite(ps)&&now-ps<=900000&&ps<=now+60000?pressure.value:null;
  if(pv!==null)mergeSensorHistory([{at:ps,p:pv}]);
  $('mp').textContent=pv===null?'--':pv.toFixed(1).replace('.',',')+' hPa';
- $('sensor-pressure-sub').textContent=pv===null?'Ecowitt · dati non disponibili':'Ecowitt · ultime 24 ore';
+ $('sensor-pressure-sub').textContent=graphCaption('p');
  sensorPlot('chart-pressure','p','#d7e8ff');
  sensorPlot('chart-temp','t','#ff9474');sensorPlot('chart-humidity','h','#68d5ff');
- $('sensor-temp-sub').textContent=t===null?'Ecowitt · dati non disponibili':sensorHistory.length<2?'Ecowitt · raccolta in corso':'Ecowitt · ultime 24 ore';
- $('sensor-humidity-sub').textContent=h===null?'Ecowitt · dati non disponibili':sensorHistory.length<2?'Ecowitt · raccolta in corso':'Ecowitt · ultime 24 ore';
+ $('sensor-temp-sub').textContent=graphCaption('t');
+ $('sensor-humidity-sub').textContent=graphCaption('h');
 }
 
 function mergeSensorHistory(points){
@@ -268,7 +294,7 @@ function mergeSensorHistory(points){
  try{localStorage.setItem('terlano-ecowitt-ch1-v1',JSON.stringify(sensorHistory));}catch(e){}
 }
 function loadSensorHistory(){
- var x=new XMLHttpRequest();x.open('GET',sensorEndpoint.slice(0,-8)+'/history',true);x.timeout=12000;
+ var x=new XMLHttpRequest();x.open('GET',sensorURL('/history'),true);x.timeout=12000;
  x.onload=function(){if(x.status!==200)return;try{var data=JSON.parse(x.responseText);if(Object.prototype.toString.call(data.points)!=='[object Array]')return;mergeSensorHistory(data.points);sensorGraphs(currentSensorValues);}catch(e){}};
  x.send();
 }
@@ -285,13 +311,13 @@ function renderSensors(data){
   var tempOK=d&&sensorNumber(d.temperature,-60,80),humOK=d&&sensorNumber(d.humidity,0,100);
   $(zone+'-temp').textContent=fresh&&tempOK?d.temperature.toFixed(1).replace('.',',')+' °C':'-- °C';
   $(zone+'-humidity').textContent=fresh&&humOK?Math.round(d.humidity)+' %':'-- %';
-  $(zone+'-state').textContent=!d?'Sensore non collegato':!fresh?'Dati non aggiornati':!tempOK||!humOK?'Misura incompleta':'Ecowitt · '+pad(new Date(stamp).getHours())+':'+pad(new Date(stamp).getMinutes());
+  $(zone+'-state').textContent=!d?'Sensore non collegato':!fresh?'Dati non aggiornati':!tempOK||!humOK?'Misura incompleta':'';
  }
 }
 function loadSensors(){
  if(!sensorEndpoint)return;
  if(sensorEndpoint.indexOf('https://')!==0){renderSensors(null);return;}
- var x=new XMLHttpRequest();x.open('GET',sensorEndpoint,true);x.timeout=12000;
+ var x=new XMLHttpRequest();x.open('GET',sensorURL('/current'),true);x.timeout=12000;
  function unavailable(){renderSensors({indoor:{},outdoor:{}});}
  x.onload=function(){if(x.status!==200){unavailable();return;}try{renderSensors(JSON.parse(x.responseText));}catch(e){unavailable();}};
  x.onerror=unavailable;x.ontimeout=unavailable;x.send();
@@ -318,11 +344,13 @@ function renderDailySensors(data){
 }
 function loadDailySensors(){
  renderDailySensors(dailySensorValues);
- var x=new XMLHttpRequest();x.open('GET',sensorEndpoint.slice(0,-8)+'/daily',true);x.timeout=12000;
+ var x=new XMLHttpRequest();x.open('GET',sensorURL('/daily'),true);x.timeout=12000;
  function unavailable(){dailySensorValues=null;renderDailySensors(null);}
  x.onload=function(){if(x.status!==200){unavailable();return;}try{dailySensorValues=JSON.parse(x.responseText);renderDailySensors(dailySensorValues);}catch(e){unavailable();}};
  x.onerror=unavailable;x.ontimeout=unavailable;x.send();
 }
 var currentSensorValues=null,dailySensorValues=null;
 setTimeout(loadDailySensors,1500);setInterval(function(){setTimeout(loadDailySensors,1500);},120000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden){loadSensors();setTimeout(loadDailySensors,1500);setTimeout(loadSensorHistory,3500);}},false);
+window.addEventListener('pageshow',function(e){if(e.persisted){loadSensors();setTimeout(loadDailySensors,1500);setTimeout(loadSensorHistory,3500);}},false);
 </script></body></html>
